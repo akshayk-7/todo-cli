@@ -6,6 +6,8 @@ import figlet from "figlet";
 import gradient from 'gradient-string';
 import chalk from "chalk";
 import { createSpinner } from 'nanospinner';
+import Table from 'cli-table3';
+
 
 
 async function mainMenu() {
@@ -64,7 +66,27 @@ async function mainMenu() {
             spinner.success({ text: 'Task added successfully!\n' });
         }
         else if (answer.action === 'view all tasks') {
-            console.log(pc.blue('\n for viewing all tasks\n'))
+            // first checking if the array is empty
+            if (tasks.length === 0) {
+                console.log(pc.red('\n No tasks found ! Try adding some first.\n'));
+            } else {
+                // creating new table instance and colums
+                const table = new Table({
+                    head: [pc.cyan('ID'), pc.cyan('Task')],
+                    colWidths: [10, 50],
+                    style: {
+                        head: ['yellow'],
+                        border: ['white']
+                    }
+                });
+                // loop through task array and pushing row into the table
+                tasks.forEach((task, index) => {
+                    table.push([index + 1, task]);
+                });
+
+                // printing the table
+                console.log('\n' + table.toString() + '\n');
+            }
         }
         else if (answer.action === 'Exit') {
             console.log(pc.red('\nGood Bye! Thanks for using the To-Do CLI\n'));
