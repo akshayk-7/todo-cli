@@ -64,7 +64,13 @@ async function mainMenu() {
                 }
             ]);
 
-            tasks.push(taskAnswer.newTask);
+            // tasks.push(taskAnswer.newTask);
+            const dateString = new Date().toLocaleDateString();
+            tasks.push({
+                name: taskAnswer.newTask,
+                date: dateString
+            });
+
             await fs.writeFile('tasks.json', JSON.stringify(tasks, null, 2));
             // fake loading spinner
             const spinner = createSpinner('Saving task...').start();
@@ -82,8 +88,8 @@ async function mainMenu() {
             } else {
                 // creating new table instance and colums
                 const table = new Table({
-                    head: [pc.cyan('ID'), pc.cyan('Task')],
-                    colWidths: [10, 50],
+                    head: [pc.cyan('ID'), pc.cyan('Task'), pc.cyan('Date')],
+                    colWidths: [10, 50, 25],
                     chars: {
                         'top': '═', 'top-mid': '╤', 'top-left': '╔', 'top-right': '╗'
                         , 'bottom': '═', 'bottom-mid': '╧', 'bottom-left': '╚', 'bottom-right': '╝'
@@ -97,7 +103,7 @@ async function mainMenu() {
                 });
                 // loop through task array and pushing row into the table
                 tasks.forEach((task, index) => {
-                    table.push([index + 1, task]);
+                    table.push([index + 1, task.name, pc.gray(task.date)]);
                 });
 
                 // printing the table
@@ -114,14 +120,13 @@ async function mainMenu() {
                         name: 'taskDelete',
                         type: 'select',
                         message: 'which task did you complete?',
-                        choices: tasks
+                        choices: tasks.map(task => task.name)
                     }
                 ]);
 
-                const index = tasks.indexOf(deleteAnswer.taskDelete);
+                const index = tasks.findIndex(task => task.name === deleteAnswer.taskDelete);
                 //  removing 1 item of that exact index
                 tasks.splice(index, 1);
-
 
                 // saving the data
                 await fs.writeFile('tasks.json', JSON.stringify(tasks, null, 2));
