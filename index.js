@@ -7,6 +7,8 @@ import gradient from 'gradient-string';
 import chalk from "chalk";
 import { createSpinner } from 'nanospinner';
 import Table from 'cli-table3';
+import fs from 'fs/promises';
+
 
 
 
@@ -29,6 +31,12 @@ async function mainMenu() {
     let isRunnig = true;
     let tasks = [];
 
+    try {
+        const fileData = await fs.readFile('tasks.json', 'utf-8');
+        tasks = JSON.parse(fileData);
+    } catch (error) {
+        tasks = [];
+    }
 
     while (isRunnig) {
 
@@ -56,6 +64,7 @@ async function mainMenu() {
             ]);
 
             tasks.push(taskAnswer.newTask);
+            await fs.writeFile('tasks.json', JSON.stringify(tasks, null, 2));
             // fake loading spinner
             const spinner = createSpinner('Saving task...').start();
 
@@ -74,9 +83,15 @@ async function mainMenu() {
                 const table = new Table({
                     head: [pc.cyan('ID'), pc.cyan('Task')],
                     colWidths: [10, 50],
+                    chars: {
+                        'top': '═', 'top-mid': '╤', 'top-left': '╔', 'top-right': '╗'
+                        , 'bottom': '═', 'bottom-mid': '╧', 'bottom-left': '╚', 'bottom-right': '╝'
+                        , 'left': '║', 'left-mid': '╟', 'mid': '─', 'mid-mid': '┼'
+                        , 'right': '║', 'right-mid': '╢', 'middle': '│'
+                    },
                     style: {
-                        head: ['yellow'],
-                        border: ['white']
+                        head: [],       // Don't automatically color headers
+                        border: []      // Keep border white
                     }
                 });
                 // loop through task array and pushing row into the table
