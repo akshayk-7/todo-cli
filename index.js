@@ -16,7 +16,7 @@ async function mainMenu() {
 
     console.clear();
 
-    const asciiArt = figlet.textSync('To Do List', {
+    const asciiArt = figlet.textSync('To Do CLI', {
         font: 'Standard',
         horizontalLayout: 'fitted',
         verticalLayout: 'default',
@@ -48,6 +48,7 @@ async function mainMenu() {
                 choices: [
                     'Add a new task',
                     'view all tasks',
+                    'Mark task as done',
                     'Exit'
                 ]
             }
@@ -101,6 +102,35 @@ async function mainMenu() {
 
                 // printing the table
                 console.log('\n' + table.toString() + '\n');
+            }
+        } else if (answer.action === 'Mark task as done') {
+            // first checking the tasks
+            if (tasks.length === 0) {
+                console.log(pc.red('\n No tasks to mark as done \n'));
+            } else {
+                // asking user to which task they want to delete
+                const deleteAnswer = await inquirer.prompt([
+                    {
+                        name: 'taskDelete',
+                        type: 'select',
+                        message: 'which task did you complete?',
+                        choices: tasks
+                    }
+                ]);
+
+                const index = tasks.indexOf(deleteAnswer.taskDelete);
+                //  removing 1 item of that exact index
+                tasks.splice(index, 1);
+
+
+                // saving the data
+                await fs.writeFile('tasks.json', JSON.stringify(tasks, null, 2));
+                const spinner = createSpinner('Removing task...').start();
+
+                await new Promise((r) => setTimeout(r, 1000));
+
+                spinner.success({ text: pc.green('Task marked as done and removed ! \n') });
+                // console.log(pc.green('\n✔ Task marked as done and removed \n'));
             }
         }
         else if (answer.action === 'Exit') {
