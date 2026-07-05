@@ -68,7 +68,9 @@ async function mainMenu() {
             const dateString = new Date().toLocaleString();
             tasks.push({
                 name: taskAnswer.newTask,
-                date: dateString
+                date: dateString,
+                completed: false,
+                completedAt: 'N/A'
             });
 
             await fs.writeFile('tasks.json', JSON.stringify(tasks, null, 2));
@@ -88,8 +90,8 @@ async function mainMenu() {
             } else {
                 // creating new table instance and colums
                 const table = new Table({
-                    head: [pc.cyan('ID'), pc.cyan('Task'), pc.cyan('Date & Time')],
-                    colWidths: [10, 50, 25],
+                    head: [pc.cyan('ID'), pc.cyan('Task'), pc.cyan('Status'), pc.cyan('Created At'), pc.cyan('Completed At')],
+                    colWidths: [6, 30, 10, 25, 25],
                     chars: {
                         'top': '═', 'top-mid': '╤', 'top-left': '╔', 'top-right': '╗'
                         , 'bottom': '═', 'bottom-mid': '╧', 'bottom-left': '╚', 'bottom-right': '╝'
@@ -103,39 +105,38 @@ async function mainMenu() {
                 });
                 // loop through task array and pushing row into the table
                 tasks.forEach((task, index) => {
-                    table.push([index + 1, task.name, pc.gray(task.date)]);
+                    const statusIcon = task.completed ? '✅' : '❌';
+                    table.push([index + 1, task.name, statusIcon, pc.gray(task.date), pc.gray(task.completedAt)]);
                 });
 
                 // printing the table
                 console.log('\n' + table.toString() + '\n');
             }
         } else if (answer.action === 'Mark task as done') {
-            // first checking the tasks
-            if (tasks.length === 0) {
+            // Only show tasks that are NOT completed yet
+            const pendingTasks = tasks.filter(task => !task.completed);
+            if (pendingTasks.length === 0) {
                 console.log(pc.red('\n No tasks to mark as done \n'));
             } else {
-                // asking user to which task they want to delete
                 const deleteAnswer = await inquirer.prompt([
                     {
-                        name: 'taskDelete',
+                        name: 'taskComplete',
                         type: 'select',
-                        message: 'which task did you complete?',
-                        choices: tasks.map(task => task.name)
+                        message: 'Which task did you complete?',
+                        choices: pendingTasks.map(task => task.name)
                     }
                 ]);
+                // Find the task in our main array
+                const index = tasks.findIndex(task => task.name === deleteAnswer.taskComplete);
 
-                const index = tasks.findIndex(task => task.name === deleteAnswer.taskDelete);
-                //  removing 1 item of that exact index
-                tasks.splice(index, 1);
-
-                // saving the data
+                // UPDATE the task instead of deleting it!
+                tasks[index].completed = true;
+                tasks[index].completedAt = new Date().toLocaleString();
                 await fs.writeFile('tasks.json', JSON.stringify(tasks, null, 2));
-                const spinner = createSpinner('Removing task...').start();
 
+                const spinner = createSpinner('Updating task...').start();
                 await new Promise((r) => setTimeout(r, 1000));
-
-                spinner.success({ text: pc.green('Task marked as done and removed ! \n') });
-                // console.log(pc.green('\n✔ Task marked as done and removed \n'));
+                spinner.success({ text: pc.green('Task marked as ✅ \n') });
             }
         }
         else if (answer.action === 'Exit') {
