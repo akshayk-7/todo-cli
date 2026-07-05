@@ -65,7 +65,7 @@ async function mainMenu() {
             ]);
 
             // tasks.push(taskAnswer.newTask);
-            const dateString = new Date().toLocaleDateString();
+            const dateString = new Date().toLocaleString();
             tasks.push({
                 name: taskAnswer.newTask,
                 date: dateString
@@ -88,7 +88,7 @@ async function mainMenu() {
             } else {
                 // creating new table instance and colums
                 const table = new Table({
-                    head: [pc.cyan('ID'), pc.cyan('Task'), pc.cyan('Date')],
+                    head: [pc.cyan('ID'), pc.cyan('Task'), pc.cyan('Date & Time')],
                     colWidths: [10, 50, 25],
                     chars: {
                         'top': '═', 'top-mid': '╤', 'top-left': '╔', 'top-right': '╗'

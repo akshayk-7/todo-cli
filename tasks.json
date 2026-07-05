@@ -1,5 +1,10 @@
 [
-  "hi",
-  "hello",
-  "this is the CLI to-do list"
+  {
+    "name": "hello",
+    "date": "5/7/2026, 11:03:44 pm"
+  },
+  {
+    "name": "added date & time feature!",
+    "date": "5/7/2026, 11:05:27 pm"
+  }
 ]
