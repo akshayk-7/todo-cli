@@ -91,7 +91,7 @@ async function mainMenu() {
                 // creating new table instance and colums
                 const table = new Table({
                     head: [pc.cyan('ID'), pc.cyan('Task'), pc.cyan('Status'), pc.cyan('Created At'), pc.cyan('Completed At')],
-                    colWidths: [6, 30, 10, 25, 25],
+                    colWidths: [5, 60, 10, 25, 25],
                     chars: {
                         'top': '═', 'top-mid': '╤', 'top-left': '╔', 'top-right': '╗'
                         , 'bottom': '═', 'bottom-mid': '╧', 'bottom-left': '╚', 'bottom-right': '╝'
@@ -136,7 +136,7 @@ async function mainMenu() {
 
                 const spinner = createSpinner('Updating task...').start();
                 await new Promise((r) => setTimeout(r, 1000));
-                spinner.success({ text: pc.green('Task marked as ✅ \n') });
+                spinner.success({ text: pc.green('Task marked as done ✅ \n') });
             }
         }
         else if (answer.action === 'Exit') {
