@@ -10,8 +10,6 @@ import Table from 'cli-table3';
 import fs from 'fs/promises';
 
 
-
-
 async function mainMenu() {
 
     console.clear();
@@ -49,6 +47,7 @@ async function mainMenu() {
                     'Add a new task',
                     'view all tasks',
                     'Mark task as done',
+                    'Delete a task',
                     'Exit'
                 ]
             }
@@ -91,7 +90,7 @@ async function mainMenu() {
                 // creating new table instance and colums
                 const table = new Table({
                     head: [pc.cyan('ID'), pc.cyan('Task'), pc.cyan('Status'), pc.cyan('Created At'), pc.cyan('Completed At')],
-                    colWidths: [5, 60, 10, 25, 25],
+                    colWidths: [5, 45, 10, 25, 25],
                     chars: {
                         'top': '═', 'top-mid': '╤', 'top-left': '╔', 'top-right': '╗'
                         , 'bottom': '═', 'bottom-mid': '╧', 'bottom-left': '╚', 'bottom-right': '╝'
@@ -138,8 +137,31 @@ async function mainMenu() {
                 await new Promise((r) => setTimeout(r, 1000));
                 spinner.success({ text: pc.green('Task marked as done ✅ \n') });
             }
-        }
-        else if (answer.action === 'Exit') {
+        } else if (answer.action === 'Delete a task') {
+            if (tasks.length === 0) {
+                console.log(pc.red('\n No tasks to delete! \n'));
+            } else {
+                const deleteAnswer = await inquirer.prompt([
+                    {
+                        name: 'taskDelete',
+                        type: 'select',
+                        message: 'Which task do you want to delete?',
+                        choices: tasks.map(task => task.name)
+                    }
+                ]);
+                const index = tasks.findIndex(task => task.name === deleteAnswer.taskDelete);
+
+                tasks.splice(index, 1);
+                await fs.writeFile('tasks.json', JSON.stringify(tasks, null, 2));
+
+                const spinner = createSpinner('Deleting task...').start();
+                await new Promise((r) => setTimeout(r, 1000));
+
+                spinner.success({ text: pc.red('Task permanently deleted! \n') });
+
+            }
+
+        } else if (answer.action === 'Exit') {
             console.log(pc.red('\nGood Bye! Thanks for using the To-Do CLI\n'));
             isRunnig = false;
         }
